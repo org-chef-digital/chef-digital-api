@@ -1,33 +1,61 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+} from '@nestjs/common';
+
+import { User } from './entities/user.entity';
+import { UserService } from './users.service';
 
 @Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  createUser(@Body() createUserDto: User): User {
+    return this.userService.createUser(createUserDto);
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  getAllUsers(): User[] {
+    return this.userService.getAllUsers();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
+  @Get(':id')
+  getUserById(@Param('id') id: string): User {
+    return this.userService.getUserById(Number(id));
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @Put(':id')
+  updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: Partial<User>,
+  ): User {
+    return this.userService.updateUser(Number(id), updateUserDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+  @Delete(':id')
+  deleteUser(@Param('id') id: string): void {
+    this.userService.deleteUser(Number(id));
+  }
+
+  @Post('login')
+  loginUser(
+    @Body() loginCredentials: { fantasyName: string; password: string },
+  ): User | string {
+    const { fantasyName, password } = loginCredentials;
+    const user = this.userService.getUserByUsername(fantasyName);
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    if (user.password !== password) {
+      throw new Error('Credenciais inválidas');
+    }
+    return user;
+  }
 }
