@@ -10,9 +10,23 @@ export class UserService {
   }
 
   createUser(user: User): User {
-    user.id = this.generateUniqueId();
-    this.users.push(user);
-    return user;
+    const newUser = new User(
+      this.generateUniqueId(),
+      user.fantasyName,
+      user.email,
+      user.password,
+      user.numberPhone,
+    );
+
+    if (this.getUserByUsername(newUser.fantasyName)) {
+      throw new Error('Usuário já cadastrado');
+    }
+    const someFieldIsEmpty = Object.values(newUser).some((value) => !value);
+    if (someFieldIsEmpty) {
+      throw new Error('Campos obrigatórios não preenchidos');
+    }
+    this.users.push(newUser);
+    return newUser;
   }
 
   getUserById(id: number): User {
