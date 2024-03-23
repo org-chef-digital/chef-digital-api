@@ -17,7 +17,7 @@ export class UserService {
       user.fantasyName,
       user.email,
       await hashedPassword,
-      user.numberPhone,
+      user.phone,
     );
 
     if (this.getUserByUsername(newUser.fantasyName)) {

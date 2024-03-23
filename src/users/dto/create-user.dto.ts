@@ -1,6 +1,6 @@
 export class CreateUserDto {
   fantasyName: string;
   email: string;
-  numberPhone: string;
+  phone: string;
   password: string;
 }
