@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 
 import { User } from './entities/user.entity';
 import { UserService } from './users.service';
@@ -16,8 +8,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  createUser(@Body() createUserDto: User): User {
-    return this.userService.createUser(createUserDto);
+  async createUser(@Body() createUserDto: User): Promise<User> {
+    return await this.userService.createUser(createUserDto);
   }
 
   @Get()
@@ -30,32 +22,16 @@ export class UserController {
     return this.userService.getUserById(Number(id));
   }
 
-  @Put(':id')
-  updateUser(
-    @Param('id') id: string,
-    @Body() updateUserDto: Partial<User>,
-  ): User {
-    return this.userService.updateUser(Number(id), updateUserDto);
-  }
-
-  @Delete(':id')
-  deleteUser(@Param('id') id: string): void {
-    this.userService.deleteUser(Number(id));
-  }
-
   @Post('login')
-  loginUser(
+  async loginUser(
     @Body() loginCredentials: { fantasyName: string; password: string },
-  ): User | string {
+  ): Promise<User | string> {
     const { fantasyName, password } = loginCredentials;
-    const user = this.userService.getUserByUsername(fantasyName);
-    if (!user) {
-      throw new Error('Usuário não encontrado');
+    try {
+      const user = await this.userService.loginUser(fantasyName, password);
+      return user;
+    } catch (error) {
+      return 'User not found';
     }
-
-    if (user.password !== password) {
-      throw new Error('Credenciais inválidas');
-    }
-    return user;
   }
 }

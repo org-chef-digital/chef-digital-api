@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -9,12 +10,13 @@ export class UserService {
     return this.users.find((user) => user.fantasyName === fantasyName);
   }
 
-  createUser(user: User): User {
+  async createUser(user: User): Promise<User> {
+    const hashedPassword = this.hashPassword(user.password);
     const newUser = new User(
       this.generateUniqueId(),
       user.fantasyName,
       user.email,
-      user.password,
+      await hashedPassword,
       user.numberPhone,
     );
 
@@ -28,6 +30,9 @@ export class UserService {
     this.users.push(newUser);
     return newUser;
   }
+  generateUniqueId(): number {
+    return this.users.length + 1;
+  }
 
   getUserById(id: number): User {
     return this.users.find((user) => user.id === id);
@@ -37,26 +42,24 @@ export class UserService {
     return this.users;
   }
 
-  updateUser(id: number, updateUserDto: Partial<User>): User {
-    const user = this.getUserById(id);
+  async loginUser(fantasyName: string, password: string): Promise<User | null> {
+    const user = this.getUserByUsername(fantasyName);
+
     if (!user) {
       throw new Error('Usuário não encontrado');
     }
-    Object.assign(user, updateUserDto);
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw new Error('Credenciais inválidas');
+    }
+
     return user;
   }
 
-  deleteUser(id: number): void {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) {
-      throw new Error('Usuário não encontrado');
-    }
-    this.users.splice(index, 1);
-  }
-
-  private generateUniqueId(): number {
-    return this.users.length > 0
-      ? Math.max(...this.users.map((user) => user.id)) + 1
-      : 1;
+  hashPassword(password: string): Promise<string> {
+    const salt = 10;
+    return bcrypt.hash(password, salt);
   }
 }
