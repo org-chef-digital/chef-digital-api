@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 
 import { User } from './entities/user.entity';
 import { UserService } from './users.service';
@@ -7,19 +15,21 @@ import { UserService } from './users.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async createUser(@Body() createUserDto: User): Promise<User> {
-    return await this.userService.createUser(createUserDto);
+  @Post('register')
+  async createUser(@Body() body: any): Promise<User> {
+    const { fantasyName, email, password, phone } = body;
+    return this.userService.createUser(fantasyName, email, password, phone);
   }
 
   @Get()
-  getAllUsers(): User[] {
-    return this.userService.getAllUsers();
+  async getAllUsers(): Promise<User[]> {
+    const products = await this.userService.getAllUsers();
+    return products;
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string): User {
-    return this.userService.getUserById(Number(id));
+  async getUserById(@Param('id') id: string): Promise<User> {
+    return this.userService.getUserById(String(id));
   }
 
   @Post('login')
@@ -29,9 +39,15 @@ export class UserController {
     const { fantasyName, password } = loginCredentials;
     try {
       const user = await this.userService.loginUser(fantasyName, password);
+      if (!user) {
+        throw new HttpException(
+          'Usuário não encontrado!',
+          HttpStatus.NOT_FOUND,
+        );
+      }
       return user;
     } catch (error) {
-      return 'User not found';
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
 }

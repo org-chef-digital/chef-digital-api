@@ -1,65 +1,71 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UserService {
   private users: User[] = [];
 
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+
   getUserByUsername(fantasyName: string): User {
     return this.users.find((user) => user.fantasyName === fantasyName);
   }
 
-  async createUser(user: User): Promise<User> {
-    const hashedPassword = this.hashPassword(user.password);
-    const newUser = new User(
-      this.generateUniqueId(),
-      user.fantasyName,
-      user.email,
-      await hashedPassword,
-      user.numberPhone,
-    );
+  async createUser(
+    fantasyName: string,
+    email: string,
+    password: string,
+    phone: string,
+  ): Promise<User> {
+    const newUser = new this.userModel({
+      fantasyName: fantasyName,
+      email: email,
+      password: password,
+      phone: phone,
+    });
 
     if (this.getUserByUsername(newUser.fantasyName)) {
       throw new Error('Usuário já cadastrado');
     }
-    const someFieldIsEmpty = Object.values(newUser).some((value) => !value);
-    if (someFieldIsEmpty) {
-      throw new Error('Campos obrigatórios não preenchidos');
-    }
-    this.users.push(newUser);
-    return newUser;
-  }
-  generateUniqueId(): number {
-    return this.users.length + 1;
+    const result = await newUser.save();
+    return result.id;
   }
 
-  getUserById(id: number): User {
-    return this.users.find((user) => user.id === id);
+  async getUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id);
+    return {
+      id: user.id,
+      fantasyName: user.fantasyName,
+      email: user.email,
+      password: user.password,
+      phone: user.phone,
+    };
   }
 
-  getAllUsers(): User[] {
-    return this.users;
+  async getAllUsers(): Promise<User[]> {
+    const users = await this.userModel.find().exec();
+    return users.map((use) => ({
+      id: use.id,
+      fantasyName: use.fantasyName,
+      email: use.email,
+      password: use.password,
+      phone: use.phone,
+    }));
   }
 
   async loginUser(fantasyName: string, password: string): Promise<User | null> {
-    const user = this.getUserByUsername(fantasyName);
-
+    const user = await this.userModel.findOne({ fantasyName, password }).exec();
     if (!user) {
-      throw new Error('Usuário não encontrado');
+      throw new Error('Credenciais inválidas.');
     }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      throw new Error('Credenciais inválidas');
-    }
-
-    return user;
-  }
-
-  hashPassword(password: string): Promise<string> {
-    const salt = 10;
-    return bcrypt.hash(password, salt);
+    return {
+      id: user.id,
+      fantasyName: user.fantasyName,
+      email: user.email,
+      password: user.password,
+      phone: user.phone,
+    };
   }
 }
