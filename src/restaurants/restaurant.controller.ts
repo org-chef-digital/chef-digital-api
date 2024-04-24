@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurant.service';
 
-@Controller('restaurant')
+@Controller('/api/v1/restaurant')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 

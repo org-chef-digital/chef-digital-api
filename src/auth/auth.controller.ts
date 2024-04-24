@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards }
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 
-@Controller('auth')
+@Controller('/api/v1/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
