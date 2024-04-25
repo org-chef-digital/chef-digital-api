@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Restaurant } from './entities/restaurant.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ApiResponse } from 'src/api_response/api-response.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,8 +14,9 @@ export class RestaurantService {
     email: string,
     password: string,
     phone: string,
-  ): Promise<Restaurant> {
-    const existingRestaurant = await this.restaurantModel.findOne({ fantasyName }).exec();
+  ): Promise<ApiResponse<Restaurant>> {
+    try {
+      const existingRestaurant = await this.restaurantModel.findOne({ fantasyName }).exec();
     if (existingRestaurant) {
       throw new Error('User already exists');
     }
@@ -46,34 +48,33 @@ export class RestaurantService {
     });
 
     const result = await newUser.save();
-    return result.toObject() as Restaurant;
+
+    return new ApiResponse(true, 'Restaurant created sucessfully', result.toObject() as Restaurant);
+    } catch (error) {
+    return new ApiResponse(false, error.message);
+    }
   }
 
-  async getRestaurantById(id: string): Promise<Restaurant> {
-    const restaurant = await this.restaurantModel.findById(id).exec();
+  async getRestaurantById(id: string): Promise<ApiResponse<Restaurant>> {
+    try {
+      const restaurant = await this.restaurantModel.findById(id).exec();
     if (!restaurant) {
       throw new Error('Restaurant not found');
     }
-    return {
-      id: restaurant.id,
-      fantasyName: restaurant.fantasyName,
-      email: restaurant.email,
-      password: restaurant.password,
-      phone: restaurant.phone,
-      status: restaurant.status,
-    };
+
+    return new ApiResponse(true, 'Restaurant found', restaurant.toObject() as Restaurant);
+    } catch (error) {
+    return new ApiResponse(false, error.message);
+    }
   }
 
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    const restaurants = await this.restaurantModel.find().exec();
-    return restaurants.map((restaurant) => ({
-      id: restaurant.id,
-      fantasyName: restaurant.fantasyName,
-      email: restaurant.email,
-      password: restaurant.password,
-      phone: restaurant.phone,
-      status: restaurant.status,
-    }));
+  async getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
+    try {
+      const restaurants = await this.restaurantModel.find().exec();
+      return new ApiResponse(true, 'Restaurants found', restaurants.map((restaurant) => restaurant.toObject() as Restaurant));
+    } catch (error) {
+      return new ApiResponse(false, error.message);
+    }
   }
 
   async getRestaurantByEmail(email: string): Promise<Restaurant> {
@@ -89,30 +90,31 @@ export class RestaurantService {
     return await bcrypt.compare(password, restaurantPassword);
   }
 
-  async getStatus(id: string): Promise<boolean> {
-    const restaurant = await this.restaurantModel.findById(id).exec();
-    if (!restaurant) {
-      throw new Error('Restaurant not found');
+  async getStatus(id: string): Promise<ApiResponse<boolean>> {
+    try {
+      const restaurant = await this.restaurantModel.findById(id).exec();
+      if (!restaurant) {
+        throw new Error('Restaurant not found');
+      }
+      return new ApiResponse(true, 'Restaurant status found', restaurant.status);
+    } catch (error) {
+      return new ApiResponse(false, error.message);
     }
-    return restaurant.status;
   }
 
-  async updateStatus(id: String, status: Boolean): Promise<Restaurant> {
-    const restaurant = await this.restaurantModel.findById(id).exec();
-    if (!restaurant) {
-      throw new Error('Restaurant not found');
+  async updateStatus(id: String, status: Boolean): Promise<ApiResponse<Restaurant>> {
+    try {
+      const restaurant = await this.restaurantModel.findById(id).exec();
+      if (!restaurant) {
+        throw new Error('Restaurant not found');
+      }
+
+      restaurant.status = true;
+      await restaurant.save();
+
+      return new ApiResponse(true, 'Restaurant status updated', restaurant.toObject() as Restaurant);
+    } catch (error) {
+      return new ApiResponse(false, error.message);
     }
-
-    restaurant.status = true;
-    await restaurant.save();
-
-    return {
-      id: restaurant.id,
-      fantasyName: restaurant.fantasyName,
-      email: restaurant.email,
-      password: restaurant.password,
-      phone: restaurant.phone,
-      status: restaurant.status,
-    };
   }
 }

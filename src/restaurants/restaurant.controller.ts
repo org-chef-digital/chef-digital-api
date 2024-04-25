@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode, Put, Patch } from '@nestjs/common';
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurant.service';
+import { ApiResponse } from 'src/api_response/api-response.dto';
 
 @Controller('/api/v1/restaurant')
 export class RestaurantController {
@@ -8,32 +9,28 @@ export class RestaurantController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  async createRestaurant(@Body() body: any): Promise<Restaurant> {
+  async createRestaurant(@Body() body: any): Promise<ApiResponse<any>> { 
     const { fantasyName, email, password, phone } = body;
-    return this.restaurantService.createRestaurant(fantasyName, email, password, phone);
+    return await this.restaurantService.createRestaurant(fantasyName, email, password, phone); // Call the service method
   }
-
   @Get()
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    return this.restaurantService.getAllRestaurants();
+  async getAllRestaurants(): Promise<ApiResponse<any>> {
+    return await this.restaurantService.getAllRestaurants();
   }
 
   @Get(':id')
-  async getRestaurantById(@Param('id') id: string): Promise<Restaurant> {
-    return this.restaurantService.getRestaurantById(String(id));
+  async getRestaurantById(@Param('id') id: string): Promise<ApiResponse<any>> {
+    return await this.restaurantService.getRestaurantById(String(id));
   }
 
   @Get(':id/status')
-  async getRestaurantStatus(@Param('id') id: string): Promise<{ status: boolean }> {
-    const restaurant = await this.restaurantService.getRestaurantById(String(id));
-    return { 
-      status: restaurant.status };
+  async getRestaurantStatus(@Param('id') id: string): Promise<ApiResponse<any>> {
+    return await this.restaurantService.getStatus(String(id));
   }
 
   @Put(':id/updateStatus')
-  async updateRestaurantStatus(@Param('id') id: string, @Body() body: any): Promise<{ status: boolean }> {
+  async updateRestaurantStatus(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<any>> {
     const { status } = body;
-    const restaurant = await this.restaurantService.updateStatus(String(id), status);
-    return { status: restaurant.status };
+    return await this.restaurantService.updateStatus(String(id), status);
   }
 }
