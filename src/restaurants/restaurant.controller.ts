@@ -11,7 +11,7 @@ export class RestaurantController {
   @Post('register')
   async createRestaurant(@Body() body: any): Promise<ApiResponse<any>> { 
     const { fantasyName, email, password, phone } = body;
-    return await this.restaurantService.createRestaurant(fantasyName, email, password, phone); // Call the service method
+    return await this.restaurantService.createRestaurant(fantasyName, email, password, phone); 
   }
   @Get()
   async getAllRestaurants(): Promise<ApiResponse<any>> {

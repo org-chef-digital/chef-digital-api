@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode
 import { Category } from './entities/category.entity';
 import { error } from 'console';
 import { CategoryService } from './category.service';
+import { ApiResponse } from 'src/api_response/api-response.dto';
 
 @Controller('/api/v1/categories')
 export class CategoryController {
@@ -9,33 +10,28 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async createCategory(@Body() body: any): Promise<Category> {
+  async createCategory(@Body() body: any): Promise<ApiResponse<Category>> {
     const { name } = body;
-    return this.categoryService.createCategory(name);
+    return await this.categoryService.createCategory(name);
   }
 
   @Get('/all')
-  async getAllCategories(): Promise<Category[]> {
-    return this.categoryService.getAllCategories();
+  async getAllCategories(): Promise<ApiResponse<Category[]>> {
+    return await this.categoryService.getAllCategories();
   }
 
   @Get(':id')
-  async getCategoryById(@Param('id') id: string): Promise<Category> {
-    return this.categoryService.getCategoryById(String(id));
+  async getCategoryById(@Param('id') id: string): Promise<ApiResponse<Category>> {
+    return await this.categoryService.getCategoryById(String(id));
   }
 
   @Put(':id')
-  async updateCategory(@Param('id') id: string, @Body() body: any): Promise<Category> {
-    const updateCategory = await this.categoryService.updateCategory(String(id), body);
-    if (!updateCategory) {
-      throw new Error('Category not found');
-    }
-    return updateCategory;
+  async updateCategory(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<Category>> {
+    return await this.categoryService.updateCategory(String(id), body);
   }
 
   @Delete(':id')  
-  async deleteCategory(@Param('id') id: string): Promise<Category> {
-    const categoryDelete = await this.categoryService.deleteCategory(id);
-    return categoryDelete;
+  async deleteCategory(@Param('id') id: string): Promise<ApiResponse<Category>> {
+    return await this.categoryService.deleteCategory(id);
   }
 }
