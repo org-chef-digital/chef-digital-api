@@ -19,6 +19,22 @@ export class RestaurantService {
       throw new Error('User already exists');
     }
 
+    const regexMin8Chars = new RegExp('.{8,}');
+    const regexUpperCase = new RegExp('.*[A-Z].*');
+    const regexLowerCase = new RegExp('.*[a-z].*');
+
+    if (!regexMin8Chars.test(password)) {
+      throw new Error('Password must have at least 8 characters');
+    }
+
+    if (!regexUpperCase.test(password)) {
+      throw new Error('Password must have at least one uppercase letter');
+    }
+
+    if (!regexLowerCase.test(password)) {
+      throw new Error('Password must have at least one lowercase letter');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new this.restaurantModel({
