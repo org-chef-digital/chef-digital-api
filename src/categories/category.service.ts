@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ApiResponse } from 'src/api_response/api-response.dto';
+import { ApiResponse } from '../api_response/api-response.dto';
 
 @Injectable()
 export class CategoryService {
