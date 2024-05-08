@@ -77,12 +77,15 @@ export class RestaurantService {
     }
   }
 
-  async getRestaurantByEmail(email: string): Promise<Restaurant> {
+  async getRestaurantByEmail(email: string): Promise<{restaurant: Restaurant; id: string}> {
     const restaurant = await this.restaurantModel.findOne({ email }).exec();
     if (!restaurant) {
       throw new Error('Email not found');
     }
-    return restaurant.toObject() as Restaurant;
+
+    const id = restaurant._id.toHexString();
+    return {restaurant, id};
+
   }
   
 
