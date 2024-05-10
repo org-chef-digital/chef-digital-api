@@ -36,8 +36,6 @@ export class AuthService {
         id: id,
         access_token: this.jwtService.sign({ sub: id, email }),
       };
-
-      console.log(responsePayload);
       
       return new ApiResponse(true, 'Login successful', responsePayload);
     } catch (error) {
