@@ -105,19 +105,22 @@ export class RestaurantService {
     }
   }
 
-  async updateStatus(id: String, status: Boolean): Promise<ApiResponse<Restaurant>> {
+  async updateStatus(id: string, status: boolean): Promise<ApiResponse<Restaurant>> {
     try {
       const restaurant = await this.restaurantModel.findById(id).exec();
       if (!restaurant) {
         throw new Error('Restaurant not found');
       }
 
-      restaurant.status = true;
-      await restaurant.save();
-
-      return new ApiResponse(true, 'Restaurant status updated', restaurant.toObject() as Restaurant);
+      restaurant.status = status;
+      console.log(restaurant.status);
+  
+      const updatedRestaurant = await restaurant.save();
+  
+      return new ApiResponse(true, 'Restaurant status updated', updatedRestaurant.toObject() as Restaurant);
     } catch (error) {
       return new ApiResponse(false, error.message);
     }
   }
+  
 }
