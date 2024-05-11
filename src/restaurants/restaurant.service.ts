@@ -113,7 +113,6 @@ export class RestaurantService {
       }
 
       restaurant.status = status;
-      console.log(restaurant.status);
   
       const updatedRestaurant = await restaurant.save();
   
