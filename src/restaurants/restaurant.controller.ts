@@ -9,27 +9,27 @@ export class RestaurantController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  async createRestaurant(@Body() body: any): Promise<ApiResponse<any>> { 
+  async createRestaurant(@Body() body: any): Promise<ApiResponse<Restaurant>> { 
     const { fantasyName, email, password, phone } = body;
     return await this.restaurantService.createRestaurant(fantasyName, email, password, phone); 
   }
   @Get()
-  async getAllRestaurants(): Promise<ApiResponse<any>> {
+  async getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
     return await this.restaurantService.getAllRestaurants();
   }
 
   @Get(':id')
-  async getRestaurantById(@Param('id') id: string): Promise<ApiResponse<any>> {
+  async getRestaurantById(@Param('id') id: string): Promise<ApiResponse<Restaurant>> {
     return await this.restaurantService.getRestaurantById(String(id));
   }
 
   @Get(':id/status')
-  async getRestaurantStatus(@Param('id') id: string): Promise<ApiResponse<any>> {
+  async getRestaurantStatus(@Param('id') id: string): Promise<ApiResponse<boolean>> {
     return await this.restaurantService.getStatus(String(id));
   }
 
   @Put(':id/updateStatus')
-  async updateRestaurantStatus(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<any>> {
+  async updateRestaurantStatus(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<Restaurant>> {
     const { status } = body;
     return await this.restaurantService.updateStatus(String(id), status);
   }
