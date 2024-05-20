@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode, Put, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, HttpStatus, HttpCode, Put, Delete, UseGuards } from '@nestjs/common';
 import { Category } from './entities/category.entity';
-import { error } from 'console';
 import { CategoryService } from './category.service';
-import { ApiResponse } from 'src/api_response/api-response.dto';
+import { ApiResponse } from '../api_response/api-response.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('/api/v1/categories')
 export class CategoryController {
@@ -10,27 +10,30 @@ export class CategoryController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
+  @UseGuards(AuthGuard)
   async createCategory(@Body() body: any): Promise<ApiResponse<Category>> {
-    const { name } = body;
-    return await this.categoryService.createCategory(name);
+    const { name, restaurantId } = body;
+    return await this.categoryService.createCategory(name, restaurantId);
   }
 
-  @Get('/all')
-  async getAllCategories(): Promise<ApiResponse<Category[]>> {
-    return await this.categoryService.getAllCategories();
+  @Get('/restaurant/:restaurantId')
+  async getAllCategories(@Param('restaurantId') restaurantId: string): Promise<ApiResponse<Category[]>> {
+    return await this.categoryService.getAllCategories(restaurantId);
   }
 
   @Get(':id')
   async getCategoryById(@Param('id') id: string): Promise<ApiResponse<Category>> {
-    return await this.categoryService.getCategoryById(String(id));
+    return await this.categoryService.getCategoryById(id);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
   async updateCategory(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<Category>> {
-    return await this.categoryService.updateCategory(String(id), body);
+    return await this.categoryService.updateCategory(id, body);
   }
 
-  @Delete(':id')  
+  @Delete(':id')
+  @UseGuards(AuthGuard)
   async deleteCategory(@Param('id') id: string): Promise<ApiResponse<Category>> {
     return await this.categoryService.deleteCategory(id);
   }
