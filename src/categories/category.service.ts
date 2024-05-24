@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Category } from './entities/category.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ApiResponse } from '../api_response/api-response.dto';
 
 @Injectable()
@@ -10,14 +10,16 @@ export class CategoryService {
 
   async createCategory(name: string, restaurantId: string): Promise<ApiResponse<Category>> {
     try {
-      const existingCategory = await this.categoryModel.findOne({ name, restaurant: restaurantId }).exec();
+      const restaurantObjectId = new Types.ObjectId(restaurantId);
+
+      const existingCategory = await this.categoryModel.findOne({ name, restaurant: restaurantObjectId }).exec();
       if (existingCategory) {
         throw new Error('Category already exists');
       }
 
       const newCategory = new this.categoryModel({
         name,
-        restaurant: restaurantId,
+        restaurant: restaurantObjectId,
       });
 
       const result = await newCategory.save();
@@ -43,7 +45,9 @@ export class CategoryService {
 
   async getAllCategories(restaurantId: string): Promise<ApiResponse<Category[]>> {
     try {
-      const categories = await this.categoryModel.find({ restaurant: restaurantId }).exec();
+      const restaurantObjectId = new Types.ObjectId(restaurantId);
+
+      const categories = await this.categoryModel.find({ restaurant: restaurantObjectId }).exec();
       return new ApiResponse(true, 'Categories found', categories.map(category => category.toObject() as Category));
     } catch (error) {
       return new ApiResponse(false, error.message);

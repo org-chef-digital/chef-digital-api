@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { Product } from "./entities/product.entity";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { ApiResponse } from "../api_response/api-response.dto";
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel('Product') private readonly productModel = Model<Product>) {}
+  constructor(@InjectModel('Product') private readonly productModel: Model<Product>) {}
 
   async createProduct(
     title: string,
@@ -16,22 +16,25 @@ export class ProductService {
     availability: boolean,
   ): Promise<ApiResponse<Product>> {
     try {
-      const existingProduct = await this.productModel.findOne({ title, category: categoryId, restaurant: restaurantId }).exec();
+      const categoryObjectId = new Types.ObjectId(categoryId);
+      const restaurantObjectId = new Types.ObjectId(restaurantId);
+
+      const existingProduct = await this.productModel.findOne({ title, category: categoryObjectId, restaurant: restaurantObjectId }).exec();
       if (existingProduct) {
-        throw new Error('Product alredy exists');
+        throw new Error('Product already exists');
       }
 
       const newProduct = new this.productModel({
         title,
         price,
-        category: categoryId,
-        restaurant: restaurantId,
+        category: categoryObjectId,
+        restaurant: restaurantObjectId,
         availability,
       });
 
       const result = await newProduct.save();
 
-      return new ApiResponse(true, 'Product created sucessfully', result.toObject() as Product);
+      return new ApiResponse(true, 'Product created successfully', result.toObject() as Product);
     } catch (error) {
       return new ApiResponse(false, error.message);
     }
