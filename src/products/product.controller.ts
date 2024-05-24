@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode, Put, Patch, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode, Put, Patch, Delete, UseGuards } from "@nestjs/common";
 import { Product } from "./entities/product.entity";
 import { ProductService } from "./product.service";
 import { ApiResponse } from "src/api_response/api-response.dto";
+import { AuthGuard } from "src/auth/auth.guard";
 
 @Controller('/api/v1/products')
 export class ProductController {
@@ -9,6 +10,7 @@ export class ProductController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('/new')
+  @UseGuards(AuthGuard)
   async createProduct(@Body() body: any): Promise<ApiResponse<Product>> {
     const { title, price, categoryId, restaurantId, availability } = body;
     return await this.productService.createProduct(title, price, categoryId, restaurantId, availability);
@@ -25,11 +27,13 @@ export class ProductController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
   async updateProduct(@Param('id') id: string, @Body() body: any): Promise<ApiResponse<Product>> {
     return await this.productService.updateProduct(String(id), body);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async deleteProduct(@Param('id') id: string): Promise<ApiResponse<Product>> {
     return this.productService.deleteProduct(String(id));
   }
