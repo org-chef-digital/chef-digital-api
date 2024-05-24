@@ -40,9 +40,11 @@ export class ProductService {
     }
   }
 
-  async getAllProducts(): Promise<ApiResponse<Product[]>> {
+  async getAllProducts(restaurantId: string): Promise<ApiResponse<Product[]>> {
     try {
-        const products = await this.productModel.find().exec();
+      const restaurantObjectId = new Types.ObjectId(restaurantId);
+
+        const products = await this.productModel.find({ restaurant: restaurantObjectId }).exec();
         return new ApiResponse(true, 'Products found', products.map(product => product.toObject() as Product));
     } catch (error) {
         return new ApiResponse(false, error.message);
