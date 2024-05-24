@@ -4,9 +4,11 @@ import { CategoryModule } from './categories/category.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductModule } from './products/product.module';
 
 @Module({
   imports: [
+    ProductModule,
     CategoryModule,
     RestaurantModule,
     AuthModule,
