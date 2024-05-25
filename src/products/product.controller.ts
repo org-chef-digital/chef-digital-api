@@ -16,9 +16,9 @@ export class ProductController {
     return await this.productService.createProduct(title, price, categoryId, restaurantId, availability);
   } 
 
-  @Get('/all')
-  async getAllProducts(): Promise<ApiResponse<Product[]>> {
-    return this.productService.getAllProducts();
+  @Get('/all/restaurant/:restaurantId')
+  async getAllProducts(@Param("restaurantId") restaurantId: string): Promise<ApiResponse<Product[]>> {
+    return this.productService.getAllProducts(restaurantId);
   }
 
   @Get(':id')
