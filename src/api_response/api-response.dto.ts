@@ -1,6 +1,6 @@
 export class ApiResponse<T> {
     constructor(
-        public sucess: boolean,
+        public success: boolean,
         public message: string,
         public data?: T, 
     ) {}
