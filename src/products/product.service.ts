@@ -40,11 +40,11 @@ export class ProductService {
     }
   }
 
-  async getAllProducts(categoryId: string): Promise<ApiResponse<Product[]>> {
+  async getAllProducts(restaurantId: string): Promise<ApiResponse<Product[]>> {
     try {
-      const categoryObjectId = new Types.ObjectId(categoryId);
+      const restaurantObjectId = new Types.ObjectId(restaurantId);
 
-        const products = await this.productModel.find({ category: categoryObjectId }).exec();
+        const products = await this.productModel.find({ restaurant: restaurantObjectId }).exec();
         return new ApiResponse(true, 'Products found', products.map(product => product.toObject() as Product));
     } catch (error) {
         return new ApiResponse(false, error.message);
