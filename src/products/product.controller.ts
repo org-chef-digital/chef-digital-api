@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, HttpCode, Put, Patch, Delete, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, HttpStatus, HttpCode, Put, Delete, UseGuards } from "@nestjs/common";
 import { Product } from "./entities/product.entity";
 import { ProductService } from "./product.service";
 import { ApiResponse } from "src/api_response/api-response.dto";
@@ -12,13 +12,18 @@ export class ProductController {
   @Post('/new')
   @UseGuards(AuthGuard)
   async createProduct(@Body() body: any): Promise<ApiResponse<Product>> {
-    const { title, price, categoryId, restaurantId, availability } = body;
-    return await this.productService.createProduct(title, price, categoryId, restaurantId, availability);
+    const { title, price, categoryId, availability } = body;
+    return await this.productService.createProduct(title, price, categoryId, availability);
   } 
 
-  @Get('/all/restaurant/:restaurantId')
-  async getAllProducts(@Param("restaurantId") restaurantId: string): Promise<ApiResponse<Product[]>> {
-    return this.productService.getAllProducts(restaurantId);
+  @Get('/all')
+  async getAllProducts(): Promise<ApiResponse<Product[]>> {
+    return await this.productService.getAllProducts();
+  }
+
+  @Get('/all/:categoryId' )
+  async getAllProductsByCategory(@Param("categoryId") categoryId: string): Promise<ApiResponse<Product[]>> {
+    return this.productService.getAllProductsByCategory(categoryId);
   }
 
   @Get(':id')

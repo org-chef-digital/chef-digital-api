@@ -12,14 +12,12 @@ export class ProductService {
     title: string,
     price: number,
     categoryId: string,
-    restaurantId: string,
     availability: boolean,
   ): Promise<ApiResponse<Product>> {
     try {
       const categoryObjectId = new Types.ObjectId(categoryId);
-      const restaurantObjectId = new Types.ObjectId(restaurantId);
 
-      const existingProduct = await this.productModel.findOne({ title, category: categoryObjectId, restaurant: restaurantObjectId }).exec();
+      const existingProduct = await this.productModel.findOne({ title, category: categoryObjectId }).exec();
       if (existingProduct) {
         throw new Error('Product already exists');
       }
@@ -28,7 +26,6 @@ export class ProductService {
         title,
         price,
         category: categoryObjectId,
-        restaurant: restaurantObjectId,
         availability,
       });
 
@@ -40,11 +37,20 @@ export class ProductService {
     }
   }
 
-  async getAllProducts(restaurantId: string): Promise<ApiResponse<Product[]>> {
+  async getAllProducts(): Promise<ApiResponse<Product[]>> {
     try {
-      const restaurantObjectId = new Types.ObjectId(restaurantId);
+      const products = await this.productModel.find().exec();
+      return new ApiResponse(true, "Products found", products.map(product => product.toObject() as Product));
+    } catch (error) {
+      return new ApiResponse(false, error.message);
+    }
+  }
 
-        const products = await this.productModel.find({ restaurant: restaurantObjectId }).exec();
+  async getAllProductsByCategory(categoryId: string): Promise<ApiResponse<Product[]>> {
+    try {
+      const categoryObjectId = new Types.ObjectId(categoryId);
+
+        const products = await this.productModel.find({ category: categoryObjectId }).exec();
         return new ApiResponse(true, 'Products found', products.map(product => product.toObject() as Product));
     } catch (error) {
         return new ApiResponse(false, error.message);
