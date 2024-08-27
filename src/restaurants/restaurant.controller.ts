@@ -33,4 +33,9 @@ export class RestaurantController {
     const { status } = body;
     return await this.restaurantService.updateStatus(String(id), status);
   }
+
+  @Delete('/all')
+  async deleteAllRestaurants(): Promise<ApiResponse<Restaurant>> {
+    return await this.restaurantService.deleteAllRestaurants();
+  }
 }

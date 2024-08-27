@@ -88,7 +88,6 @@ export class RestaurantService {
 
   }
   
-
   async validatePassword(password: string, restaurantPassword: string): Promise<boolean> {
     return await bcrypt.compare(password, restaurantPassword);
   }
@@ -117,6 +116,16 @@ export class RestaurantService {
       const updatedRestaurant = await restaurant.save();
   
       return new ApiResponse(true, 'Restaurant status updated', updatedRestaurant.toObject() as Restaurant);
+    } catch (error) {
+      return new ApiResponse(false, error.message);
+    }
+  }
+
+  async deleteAllRestaurants(): Promise<ApiResponse<Restaurant>> {
+    try {
+      const result = await this.restaurantModel.deleteMany({}).exec();
+
+      return new ApiResponse(true, 'All restaurants deleted');
     } catch (error) {
       return new ApiResponse(false, error.message);
     }
