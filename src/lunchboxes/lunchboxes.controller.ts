@@ -11,8 +11,8 @@ export class LunchboxesController {
   @HttpCode(HttpStatus.CREATED)
   @Post('/new')
   async createLunchbox(@Body() createLunchboxDto: CreateLunchboxDto): Promise<ApiResponse<Lunchbox>> {
-    const { type, size, price, productsIds, categoryIds } = createLunchboxDto;
-    return await this.lunchboxesService.createLunchbox(type, size, price, productsIds, categoryIds);
+    const { type, size, price, productsIds } = createLunchboxDto;
+    return await this.lunchboxesService.createLunchbox(type, size, price, productsIds);
   }
 
   @Get('/all')

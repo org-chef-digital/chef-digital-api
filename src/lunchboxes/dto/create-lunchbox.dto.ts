@@ -14,7 +14,4 @@ export class CreateLunchboxDto {
   @IsOptional()
   productsIds?: string[];
 
-  @IsArray()
-  @IsOptional()
-  categoryIds?: string[];
 }

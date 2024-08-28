@@ -12,7 +12,6 @@ export class LunchboxesService {
   async createLunchbox(type: string, size: number, price: number, productsIds: string[] = [], categoryIds: string[] = []): Promise<ApiResponse<Lunchbox>> {
     try {
       const productObjectIds = productsIds.map(id => new Types.ObjectId(id));
-      const categoryObjectIds = categoryIds.map(id => new Types.ObjectId(id));
   
       const existingLunchbox = await this.lunchboxModel.findOne({ price }).exec();
   
@@ -25,7 +24,6 @@ export class LunchboxesService {
         size,
         price,
         products: productObjectIds.length ? productObjectIds : undefined,
-        categories: categoryObjectIds.length ? categoryObjectIds : undefined,
       });
   
       const result = await newLunchbox.save();
@@ -36,9 +34,6 @@ export class LunchboxesService {
     }
   }
   
-  
-  
-
   async getAllLunchboxes(): Promise<ApiResponse<Lunchbox[]>> {
     try {
       const lunchboxes = await this.lunchboxModel.find().exec();

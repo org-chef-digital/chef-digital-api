@@ -5,7 +5,6 @@ export const LunchboxSchema = new mongoose.Schema({
     size: { type: Number, required: true },
     price: { type: Number, required: true },
     products: [{type: mongoose.Schema.Types.ObjectId, ref: 'Product'}], 
-    categories: [{type: mongoose.Schema.Types.ObjectId, ref: 'Category'}],
 })
 
 export interface Lunchbox {
@@ -14,5 +13,4 @@ export interface Lunchbox {
     size: number;
     price: number;
     products: string[];
-    categories: string[];
 }
