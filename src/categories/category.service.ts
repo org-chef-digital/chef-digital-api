@@ -8,7 +8,7 @@ import { ApiResponse } from '../api_response/api-response.dto';
 export class CategoryService {
   constructor(@InjectModel('Category') private readonly categoryModel: Model<Category>) {}
 
-  async createCategory(name: string, restaurantId: string): Promise<ApiResponse<Category>> {
+  async createCategory(name: string, restaurantId: string, maxSelection: number): Promise<ApiResponse<Category>> {
     try {
       const restaurantObjectId = new Types.ObjectId(restaurantId);
 
@@ -20,6 +20,7 @@ export class CategoryService {
       const newCategory = new this.categoryModel({
         name,
         restaurant: restaurantObjectId,
+        maxSelection,
       });
 
       const result = await newCategory.save();

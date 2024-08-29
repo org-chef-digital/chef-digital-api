@@ -12,8 +12,8 @@ export class CategoryController {
   @Post()
   @UseGuards(AuthGuard)
   async createCategory(@Body() body: any): Promise<ApiResponse<Category>> {
-    const { name, restaurantId } = body;
-    return await this.categoryService.createCategory(name, restaurantId);
+    const { name, restaurantId, maxSelection } = body;
+    return await this.categoryService.createCategory(name, restaurantId, maxSelection);
   }
 
   @Get('/restaurant/:restaurantId')
