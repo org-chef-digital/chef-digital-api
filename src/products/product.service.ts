@@ -17,10 +17,7 @@ export class ProductService {
     try {
       const categoryObjectId = new Types.ObjectId(categoryId);
 
-      const existingProduct = await this.productModel.findOne({ title, category: categoryObjectId }).exec();
-      if (existingProduct) {
-        throw new Error('Product already exists');
-      }
+      await this.checkExistingProduct(title, categoryObjectId);
 
       const newProduct = new this.productModel({
         title,
@@ -94,6 +91,13 @@ export class ProductService {
         return new ApiResponse(true, 'Product deleted', product.toObject() as Product);
     } catch (error) {
         return new ApiResponse(false, error.message);
+    }
+  }
+
+  private async checkExistingProduct(title: string, categoryObjectId: Types.ObjectId) {
+    const existingProduct = await this.productModel.findOne({ title, category: categoryObjectId }).exec();
+    if (existingProduct) {
+      throw new Error('Product already exists');
     }
   }
 }
