@@ -12,10 +12,7 @@ export class CategoryService {
     try {
       const restaurantObjectId = new Types.ObjectId(restaurantId);
 
-      const existingCategory = await this.categoryModel.findOne({ name, restaurant: restaurantObjectId }).exec();
-      if (existingCategory) {
-        throw new Error('Category already exists');
-      }
+      await this.checkExistingCategory(name, restaurantObjectId);
 
       const newCategory = new this.categoryModel({
         name,
@@ -83,4 +80,12 @@ export class CategoryService {
       return new ApiResponse(false, error.message);
     }
   }
+
+  private async checkExistingCategory(name: string, restaurantObjectId: Types.ObjectId) {
+    const existingCategory = await this.categoryModel.findOne({ name, restaurant: restaurantObjectId }).exec();
+    if (existingCategory) {
+      throw new Error('Category already exists');
+    }
+  }
+  
 }
