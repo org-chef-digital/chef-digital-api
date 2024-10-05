@@ -13,11 +13,7 @@ export class LunchboxesService {
     try {
       const productObjectIds = productsIds.map(id => new Types.ObjectId(id));
   
-      const existingLunchbox = await this.lunchboxModel.findOne({ price }).exec();
-  
-      if (existingLunchbox) {
-        throw new Error('Lunchbox already exists');
-      }
+      await this.checkExistingLunchbox(price);
   
       const newLunchbox = new this.lunchboxModel({
         type,
@@ -34,6 +30,7 @@ export class LunchboxesService {
     }
   }
   
+
   async getAllLunchboxes(): Promise<ApiResponse<Lunchbox[]>> {
     try {
       const lunchboxes = await this.lunchboxModel.find().exec();
@@ -72,5 +69,11 @@ export class LunchboxesService {
       return new ApiResponse(false, error.message);
     }
   }
-   
+  private async checkExistingLunchbox(price: number) {
+    const existingLunchbox = await this.lunchboxModel.findOne({ price }).exec();
+
+    if (existingLunchbox) {
+      throw new Error('Lunchbox already exists');
+    }
+  }
 }
